@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Constancia de Situación Fiscal — $60 MXN | Trámites Digitales</title>
+  <meta name="description" content="Obtén tu Constancia de Situación Fiscal en menos de 1 hora. Proceso seguro, precio fijo $60 MXN. Atendemos sábados y domingos."/>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --ink:#0D0F14;--paper:#F7F6F2;--accent:#1A6BFF;
+      --green:#00C896;--red:#FF4444;--muted:#6B7080;
+      --card:#FFFFFF;--border:#E2E4EA;--wa:#25D366;
+    }
+    html{scroll-behavior:smooth}
+    body{font-family:'Inter',sans-serif;background:var(--paper);color:var(--ink);-webkit-font-smoothing:antialiased}
+
+    /* ══ URGENCY BAR ══ */
+    .urgency-bar{background:linear-gradient(90deg,#0D0F14,#1a2340);color:#fff;text-align:center;padding:.6rem 1rem;font-size:.82rem;font-weight:500;display:flex;align-items:center;justify-content:center;gap:.6rem;flex-wrap:wrap}
+    .urgency-bar .dot{width:7px;height:7px;border-radius:50%;background:var(--green);display:inline-block;animation:blink 1.4s infinite}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+    .countdown{font-family:'Syne',sans-serif;font-weight:800;color:var(--green);font-size:.95rem;letter-spacing:.04em}
+
+    /* ══ MEJORA 9: CUPOS DEL DÍA ══ */
+    .cupos-bar{background:#fff8e6;border-bottom:1px solid #ffe5a0;padding:.55rem 1rem;text-align:center;font-size:.82rem;font-weight:500;color:#7a5c00;display:flex;align-items:center;justify-content:center;gap:.5rem}
+    .cupos-num{font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;color:#d97706}
+    .cupos-bar .cupos-dots{display:flex;gap:3px;align-items:center}
+    .cupo-dot{width:10px;height:10px;border-radius:50%;background:#d97706}
+    .cupo-dot.taken{background:#e5e7eb}
+
+    /* ══ LIVE TOAST ══ */
+    .live-toast{position:fixed;bottom:5.5rem;left:1.2rem;z-index:900;background:#fff;border:1px solid var(--border);border-left:4px solid var(--green);border-radius:12px;padding:.75rem 1rem;box-shadow:0 8px 32px rgba(0,0,0,.12);display:flex;align-items:center;gap:.75rem;max-width:280px;font-size:.8rem;transform:translateX(-120%);transition:transform .4s cubic-bezier(.34,1.56,.64,1)}
+    .live-toast.show{transform:translateX(0)}
+    .live-toast-icon{font-size:1.4rem;flex-shrink:0}
+    .live-toast strong{display:block;font-weight:600;color:var(--ink);font-size:.82rem}
+    .live-toast span{color:var(--muted)}
+
+    /* ══ MEJORA 13: AGENTE EN LÍNEA ══ */
+    .agent-bar{background:var(--card);border-bottom:1px solid var(--border);padding:.5rem clamp(1rem,4vw,3rem);display:flex;align-items:center;justify-content:center;gap:.6rem;font-size:.8rem;color:var(--muted)}
+    .agent-dot{width:8px;height:8px;border-radius:50%;background:var(--green);animation:blink 2s infinite;flex-shrink:0}
+    .agent-name{font-weight:600;color:var(--ink)}
+
+    /* ══ NAV ══ */
+    nav{position:sticky;top:0;z-index:200;background:rgba(247,246,242,.92);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);padding:0 clamp(1.25rem,5vw,4rem);height:60px;display:flex;align-items:center;justify-content:space-between}
+    .nav-brand{font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;letter-spacing:-.01em;color:var(--ink);text-decoration:none}
+    .nav-brand span{color:var(--accent)}
+    .nav-cta{background:var(--wa);color:#fff;border:none;border-radius:8px;padding:.45rem 1.1rem;font-family:'Inter',sans-serif;font-size:.85rem;font-weight:600;cursor:pointer;text-decoration:none;transition:opacity .2s;display:flex;align-items:center;gap:.4rem}
+    .nav-cta:hover{opacity:.88}
+
+    /* ══ PROGRESS BAR ══ */
+    .progress-bar-wrap{position:fixed;top:60px;left:0;right:0;z-index:190;background:var(--card);border-bottom:1px solid var(--border);padding:.55rem clamp(1rem,4vw,3rem);display:flex;align-items:center;gap:1rem;transform:translateY(-100%);transition:transform .3s}
+    .progress-bar-wrap.visible{transform:translateY(0)}
+    .progress-steps{display:flex;align-items:center;gap:.4rem;flex:1}
+    .prog-step{display:flex;align-items:center;gap:.4rem;font-size:.75rem;font-weight:600;color:var(--muted)}
+    .prog-step.done{color:var(--green)}
+    .prog-step.done .prog-dot{background:var(--green)}
+    .prog-dot{width:22px;height:22px;border-radius:50%;background:var(--border);display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:800;color:#fff;flex-shrink:0}
+    .prog-line{height:2px;flex:1;background:var(--border);border-radius:2px;min-width:16px}
+    .prog-line.done{background:var(--green)}
+    .prog-cta{background:var(--wa);color:#fff;border:none;border-radius:8px;padding:.4rem 1rem;font-size:.78rem;font-weight:700;cursor:pointer;text-decoration:none;white-space:nowrap}
+    @media(max-width:500px){.prog-step span{display:none}}
+
+    /* ══ EXIT POPUP ══ */
+    .popup-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;display:none;align-items:center;justify-content:center;padding:1rem}
+    .popup-overlay.show{display:flex}
+    .popup-box{background:var(--card);border-radius:20px;padding:2.5rem 2rem;max-width:420px;width:100%;text-align:center;position:relative;box-shadow:0 24px 80px rgba(0,0,0,.25);animation:pop-in .3s cubic-bezier(.34,1.56,.64,1)}
+    @keyframes pop-in{from{transform:scale(.85);opacity:0}to{transform:scale(1);opacity:1}}
+    .popup-close{position:absolute;top:1rem;right:1rem;background:none;border:none;font-size:1.4rem;cursor:pointer;color:var(--muted);line-height:1}
+    .popup-emoji{font-size:3rem;margin-bottom:1rem}
+    .popup-box h3{font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:800;margin-bottom:.6rem}
+    .popup-box p{color:var(--muted);font-size:.9rem;margin-bottom:1.5rem;line-height:1.6}
+    .popup-price{font-family:'Syne',sans-serif;font-size:2.4rem;font-weight:800;color:var(--accent);margin-bottom:1.5rem}
+    .popup-price small{font-size:1rem;color:var(--muted);font-family:'Inter',sans-serif;font-weight:500}
+    .popup-btn{display:block;width:100%;background:var(--wa);color:#fff;border:none;border-radius:12px;padding:1rem;font-family:'Inter',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;text-decoration:none;text-align:center}
+
+    /* ══ HERO ══ */
+    .hero{padding:clamp(3.5rem,8vw,7rem) clamp(1.25rem,5vw,4rem) clamp(2.5rem,6vw,5rem);max-width:900px;margin:0 auto;text-align:center}
+    .eyebrow{display:inline-block;font-size:.78rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);background:rgba(26,107,255,.08);border-radius:100px;padding:.3rem .9rem;margin-bottom:1.4rem}
+    .hero h1{font-family:'Syne',sans-serif;font-size:clamp(2.4rem,7vw,4.8rem);font-weight:800;line-height:1.05;letter-spacing:-.03em;margin-bottom:1.1rem}
+    .hero h1 em{font-style:normal;background:linear-gradient(110deg,var(--accent),var(--green));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .hero-sub{font-size:clamp(1rem,2.5vw,1.15rem);color:var(--muted);max-width:500px;margin:0 auto 2.2rem;line-height:1.65}
+    .price-wrap{display:inline-flex;flex-direction:column;align-items:center;gap:.4rem;margin-bottom:1.6rem}
+    .price-badge{display:inline-flex;align-items:baseline;gap:.4rem;background:var(--ink);color:#fff;border-radius:16px;padding:.9rem 2rem}
+    .price-currency{font-size:1.4rem;font-weight:600;opacity:.6}
+    .price-amount{font-family:'Syne',sans-serif;font-size:3.6rem;font-weight:800;line-height:1}
+    .price-label{font-size:.8rem;opacity:.55;align-self:flex-end;margin-bottom:.35rem}
+    .price-urgency{font-size:.78rem;font-weight:600;color:var(--red);background:rgba(255,68,68,.08);border-radius:100px;padding:.25rem .8rem;letter-spacing:.04em;animation:pulse-red 2s infinite}
+    @keyframes pulse-red{0%,100%{opacity:1}50%{opacity:.6}}
+    .trust-seals{display:flex;flex-wrap:wrap;justify-content:center;gap:.5rem 1.2rem;margin-bottom:1.8rem}
+    .seal{display:flex;align-items:center;gap:.35rem;font-size:.78rem;font-weight:600;color:var(--muted);background:var(--card);border:1px solid var(--border);border-radius:100px;padding:.3rem .8rem}
+    .hero-actions{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;margin-bottom:1rem}
+
+    /* ══ MEJORA 11: BOTÓN MAGNÉTICO ══ */
+    .btn-primary{display:inline-flex;align-items:center;gap:.5rem;background:var(--wa);color:#fff;border:none;border-radius:12px;padding:.9rem 2rem;font-family:'Inter',sans-serif;font-size:1rem;font-weight:600;cursor:pointer;text-decoration:none;transition:transform .1s,box-shadow .15s;box-shadow:0 4px 20px rgba(37,211,102,.4);position:relative;overflow:hidden}
+    .btn-primary::after{content:'';position:absolute;inset:0;background:rgba(255,255,255,.15);opacity:0;transition:opacity .2s}
+    .btn-primary:hover::after{opacity:1}
+    .btn-primary:hover{box-shadow:0 8px 32px rgba(37,211,102,.55)}
+    .btn-secondary{display:inline-flex;align-items:center;gap:.5rem;background:transparent;color:var(--ink);border:1.5px solid var(--border);border-radius:12px;padding:.9rem 2rem;font-family:'Inter',sans-serif;font-size:1rem;font-weight:600;cursor:pointer;text-decoration:none;transition:border-color .2s,color .2s}
+    .btn-secondary:hover{border-color:var(--accent);color:var(--accent)}
+    .trust-strip{display:flex;flex-wrap:wrap;justify-content:center;gap:.5rem 1.4rem;max-width:520px;margin:0 auto;padding-top:.4rem}
+    .trust-item{display:flex;align-items:center;gap:.4rem;font-size:.8rem;color:var(--muted)}
+    .trust-dot{width:6px;height:6px;border-radius:50%;background:var(--green);flex-shrink:0}
+
+    /* ══ DIVIDER ══ */
+    .section-divider{border:none;border-top:1px solid var(--border);max-width:1100px;margin:0 auto}
+
+    /* ══ STATS ══ */
+    .stats-bar{background:var(--card);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:2rem clamp(1.25rem,5vw,4rem)}
+    .stats-inner{max-width:800px;margin:0 auto;display:flex;justify-content:center;gap:clamp(2rem,8vw,6rem);flex-wrap:wrap}
+    .stat-item{text-align:center}
+    .stat-num{font-family:'Syne',sans-serif;font-size:clamp(1.8rem,4vw,2.8rem);font-weight:800;color:var(--accent);line-height:1}
+    .stat-label{font-size:.78rem;color:var(--muted);margin-top:.3rem}
+
+    /* ══ MEJORA 14: PARA QUIÉN ES ══ */
+    .para-quien{padding:clamp(3rem,6vw,5rem) clamp(1.25rem,5vw,4rem);max-width:1100px;margin:0 auto}
+    .para-quien h2{font-family:'Syne',sans-serif;font-size:clamp(1.6rem,4vw,2.4rem);font-weight:800;letter-spacing:-.025em;margin-bottom:.5rem}
+    .pq-sub{color:var(--muted);font-size:.9rem;margin-bottom:2rem}
+    .pq-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem}
+    .pq-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.3rem;display:flex;gap:.8rem;align-items:flex-start;transition:border-color .2s,transform .2s}
+    .pq-card:hover{border-color:var(--green);transform:translateY(-2px)}
+    .pq-icon{font-size:1.6rem;flex-shrink:0}
+    .pq-title{font-weight:700;font-size:.9rem;margin-bottom:.2rem}
+    .pq-desc{font-size:.8rem;color:var(--muted);line-height:1.5}
+
+    /* ══ TABLA COMPARATIVA ══ */
+    .compare{padding:clamp(3rem,6vw,5rem) clamp(1.25rem,5vw,4rem);max-width:1100px;margin:0 auto}
+    .compare h2{font-family:'Syne',sans-serif;font-size:clamp(1.6rem,4vw,2.4rem);font-weight:800;letter-spacing:-.025em;margin-bottom:.5rem}
+    .compare-sub{color:var(--muted);font-size:.9rem;margin-bottom:2rem}
+    .compare-table{width:100%;border-collapse:collapse;background:var(--card);border-radius:16px;overflow:hidden;border:1px solid var(--border)}
+    .compare-table th{padding:.9rem 1.2rem;font-size:.78rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);background:#f8f9fb;border-bottom:1px solid var(--border);text-align:left}
+    .compare-table th:not(:first-child){text-align:center}
+    .compare-table td{padding:.9rem 1.2rem;border-bottom:1px solid var(--border);font-size:.88rem;vertical-align:middle}
+    .compare-table tr:last-child td{border-bottom:none}
+    .compare-table td:not(:first-child){text-align:center}
+    .compare-table .col-us{background:rgba(26,107,255,.04);font-weight:600}
+    .col-head-us{color:var(--accent)!important}
+    .check{color:var(--green);font-size:1.1rem}
+    .cross{color:#ccc;font-size:1.1rem}
+    .compare-table td.feat-name{font-weight:500}
+
+    /* ══ MEJORA 10: CALCULADORA ══ */
+    .calculadora{padding:clamp(3rem,6vw,5rem) clamp(1.25rem,5vw,4rem);background:var(--ink);color:#fff}
+    .calc-inner{max-width:700px;margin:0 auto;text-align:center}
+    .calc-inner h2{font-family:'Syne',sans-serif;font-size:clamp(1.6rem,4vw,2.4rem);font-weight:800;letter-spacing:-.025em;margin-bottom:.5rem}
+    .calc-sub{color:rgba(255,255,255,.55);font-size:.9rem;margin-bottom:2.5rem}
+    .calc-controls{display:flex;flex-direction:column;gap:1.5rem;margin-bottom:2rem}
+    .calc-row{display:flex;flex-direction:column;gap:.5rem;text-align:left}
+    .calc-row label{font-size:.82rem;font-weight:600;color:rgba(255,255,255,.7);letter-spacing:.06em;text-transform:uppercase}
+    .calc-row input[type=range]{-webkit-appearance:none;width:100%;height:4px;border-radius:2px;background:rgba(255,255,255,.2);outline:none;cursor:pointer}
+    .calc-row input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--green);cursor:pointer;box-shadow:0 0 0 4px rgba(0,200,150,.25)}
+    .calc-val{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:var(--green)}
+    .calc-result{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:2rem;margin-top:1rem}
+    .calc-result-label{font-size:.8rem;color:rgba(255,255,255,.5);margin-bottom:.5rem;text-transform:uppercase;letter-spacing:.08em}
+    .calc-result-num{font-family:'Syne',sans-serif;font-size:3rem;font-weight:800;color:var(--green);line-height:1;margin-bottom:.5rem}
+    .calc-result-msg{font-size:.85rem;color:rgba(255,255,255,.55);line-height:1.6}
+    .calc-cta{display:inline-flex;align-items:center;gap:.5rem;background:var(--wa);color:#fff;border:none;border-radius:12px;padding:.85rem 1.8rem;font-family:'Inter',sans-serif;font-size:.95rem;font-weight:700;cursor:pointer;text-decoration:none;margin-top:1.5rem;transition:opacity .2s}
+    .calc-cta:hover{opacity:.88}
+
+    /* ══ FEATURES ══ */
+    .features{padding:clamp(3rem,7vw,6rem) clamp(1.25rem,5vw,4rem);max-width:1100px;margin:0 auto}
+    .section-label{font-size:.75rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:2.5rem}
+    .features-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.2rem}
+    .feat-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:1.6rem 1.4rem;transition:box-shadow .2s,transform .2s}
+    .feat-card:hover{transform:translateY(-3px);box-shadow:0 8px 32px rgba(0,0,0,.07)}
+    .feat-icon{font-size:1.8rem;margin-bottom:1rem;display:block}
+    .feat-title{font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;margin-bottom:.4rem}
+    .feat-desc{font-size:.86rem;color:var(--muted);line-height:1.6}
+
+    /* ══ HOW IT WORKS ══ */
+    .how{padding:clamp(3rem,7vw,6rem) clamp(1.25rem,5vw,4rem);background:var(--ink);color:#fff}
+    .how-inner{max-width:1100px;margin:0 auto}
+    .how h2{font-family:'Syne',sans-serif;font-size:clamp(1.8rem,4vw,2.8rem);font-weight:800;letter-spacing:-.025em;margin-bottom:.5rem}
+    .how-sub{color:rgba(255,255,255,.5);font-size:.9rem;margin-bottom:2.5rem}
+    .steps{display:flex;flex-direction:column}
+    .step{display:grid;grid-template-columns:48px 1fr;gap:1rem;padding:1.4rem 0;border-top:1px solid rgba(255,255,255,.1);align-items:start}
+    .step:last-child{border-bottom:1px solid rgba(255,255,255,.1)}
+    .step-num{font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;color:var(--green);line-height:1;padding-top:.1rem}
+    .step-title{font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;margin-bottom:.3rem}
+    .step-desc{font-size:.86rem;color:rgba(255,255,255,.55);line-height:1.65}
+
+    /* ══ MEJORA 12: CHAT PREVIEW ══ */
+    .chat-preview{padding:clamp(3rem,6vw,5rem) clamp(1.25rem,5vw,4rem);max-width:1100px;margin:0 auto}
+    .chat-preview h2{font-family:'Syne',sans-serif;font-size:clamp(1.6rem,4vw,2.4rem);font-weight:800;letter-spacing:-.025em;margin-bottom:.5rem}
+    .chat-sub{color:var(--muted);font-size:.9rem;margin-bottom:2rem}
+    .chat-window{background:#e5ddd5;border-radius:16px;padding:1.2rem;max-width:420px;font-size:.85rem;background-image:url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23c1b09a' fill-opacity='0.12'%3E%3Cpath d='M20 20.5V18H0v5h5v5H0v5h20v-5h15v-5H20zM20 0H0v5h5v5H0v5h20z'/%3E%3C/g%3E%3C/svg%3E")}
+    .chat-header{background:#075e54;color:#fff;border-radius:10px 10px 0 0;padding:.7rem 1rem;display:flex;align-items:center;gap:.7rem;margin:-1.2rem -1.2rem 1rem}
+    .chat-avatar{width:36px;height:36px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.9rem;flex-shrink:0}
+    .chat-agent-name{font-weight:700;font-size:.88rem}
+    .chat-status{font-size:.72rem;opacity:.8}
+    .msg{margin-bottom:.7rem;display:flex;flex-direction:column}
+    .msg.agent{align-items:flex-start}
+    .msg.user{align-items:flex-end}
+    .msg-bubble{padding:.6rem .9rem;border-radius:10px;max-width:80%;line-height:1.5;position:relative;font-size:.83rem}
+    .msg.agent .msg-bubble{background:#fff;border-radius:0 10px 10px 10px}
+    .msg.user .msg-bubble{background:#dcf8c6;border-radius:10px 10px 0 10px}
+    .msg-time{font-size:.65rem;color:rgba(0,0,0,.4);margin-top:.2rem;padding:0 .3rem}
+    .msg.user .msg-time{display:flex;align-items:center;gap:.2rem}
+    .chat-typing{display:flex;align-items:center;gap:.3rem;padding:.5rem .9rem;background:#fff;border-radius:0 10px 10px 10px;width:fit-content}
+    .typing-dot{width:6px;height:6px;border-radius:50%;background:#aaa;animation:typing 1.4s infinite}
+    .typing-dot:nth-child(2){animation-delay:.2s}
+    .typing-dot:nth-child(3){animation-delay:.4s}
+    @keyframes typing{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
+    .chat-cta{margin-top:1.2rem;display:inline-flex;align-items:center;gap:.5rem;background:var(--wa);color:#fff;border:none;border-radius:12px;padding:.85rem 1.8rem;font-family:'Inter',sans-serif;font-size:.95rem;font-weight:700;cursor:pointer;text-decoration:none;box-shadow:0 4px 16px rgba(37,211,102,.35)}
+
+    /* ══ TESTIMONIOS ══ */
+    .testimonios{padding:clamp(3rem,7vw,6rem) clamp(1.25rem,5vw,4rem);max-width:1100px;margin:0 auto}
+    .testimonios h2{font-family:'Syne',sans-serif;font-size:clamp(1.6rem,4vw,2.4rem);font-weight:800;letter-spacing:-.025em;margin-bottom:.4rem}
+    .testi-sub{color:var(--muted);font-size:.9rem;margin-bottom:2.2rem}
+    .testi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.2rem}
+    .testi-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:1.5rem}
+    .stars{color:#FFBA08;font-size:1rem;margin-bottom:.8rem;letter-spacing:.05em}
+    .testi-text{font-size:.88rem;line-height:1.65;color:var(--ink);margin-bottom:1rem;font-style:italic}
+    .testi-author{display:flex;align-items:center;gap:.6rem}
+    .testi-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--green));display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:.85rem;color:#fff;flex-shrink:0}
+    .testi-name{font-weight:600;font-size:.82rem}
+    .testi-city{font-size:.76rem;color:var(--muted)}
+
+    /* ══ AVAILABILITY ══ */
+    .avail{padding:clamp(3rem,6vw,5rem) clamp(1.25rem,5vw,4rem);max-width:1100px;margin:0 auto}
+    .avail-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem}
+    @media(max-width:600px){.avail-grid{grid-template-columns:1fr}}
+    .avail-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:1.8rem 1.6rem;display:flex;align-items:flex-start;gap:1rem}
+    .avail-card.accent{background:linear-gradient(135deg,#1A6BFF 0%,#0047CC 100%);border-color:transparent;color:#fff}
+    .avail-card.accent .avail-label,.avail-card.accent .avail-value{color:#fff}
+    .avail-card.accent .avail-label{opacity:.7}
+    .avail-emoji{font-size:1.8rem;flex-shrink:0}
+    .avail-label{font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:.3rem}
+    .avail-value{font-family:'Syne',sans-serif;font-size:1.05rem;font-weight:700}
+
+    /* ══ GARANTÍA ══ */
+    .garantia{padding:clamp(2rem,5vw,4rem) clamp(1.25rem,5vw,4rem);max-width:1100px;margin:0 auto}
+    .garantia-inner{background:linear-gradient(135deg,#00C896,#00976e);border-radius:20px;padding:clamp(2rem,5vw,3rem);display:flex;align-items:center;gap:2rem;flex-wrap:wrap;color:#fff}
+    .garantia-icon{font-size:3rem;flex-shrink:0}
+    .garantia-title{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800;margin-bottom:.4rem}
+    .garantia-desc{font-size:.9rem;opacity:.85;line-height:1.65;max-width:460px}
+
+    /* ══ MEJORA 15: MÉTODOS DE PAGO ══ */
+    .payment-strip{padding:1.5rem clamp(1.25rem,5vw,4rem);border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:var(--card)}
+    .payment-inner{max-width:700px;margin:0 auto;text-align:center}
+    .payment-label{font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:1rem}
+    .payment-icons{display:flex;align-items:center;justify-content:center;gap:1rem;flex-wrap:wrap}
+    .pay-chip{display:flex;align-items:center;gap:.4rem;background:var(--paper);border:1px solid var(--border);border-radius:8px;padding:.45rem .9rem;font-size:.78rem;font-weight:600;color:var(--ink)}
+    .pay-chip span{font-size:1rem}
+
+    /* ══ FAQ ══ */
+    .faq{padding:clamp(3rem,7vw,6rem) clamp(1.25rem,5vw,4rem);background:var(--ink);color:#fff}
+    .faq-inner{max-width:720px;margin:0 auto}
+    .faq h2{font-family:'Syne',sans-serif;font-size:clamp(1.6rem,4vw,2.4rem);font-weight:800;letter-spacing:-.025em;margin-bottom:2.5rem}
+    .faq-item{border-top:1px solid rgba(255,255,255,.12);padding:1.2rem 0}
+    .faq-item:last-child{border-bottom:1px solid rgba(255,255,255,.12)}
+    .faq-q{font-family:'Syne',sans-serif;font-size:.97rem;font-weight:700;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:1rem;user-select:none}
+    .faq-q::after{content:'+';font-size:1.4rem;opacity:.5;flex-shrink:0;transition:transform .2s}
+    .faq-item.open .faq-q::after{transform:rotate(45deg);opacity:1}
+    .faq-a{font-size:.86rem;color:rgba(255,255,255,.6);line-height:1.7;max-height:0;overflow:hidden;transition:max-height .3s ease,margin-top .3s}
+    .faq-item.open .faq-a{max-height:200px;margin-top:.8rem}
+
+    /* ══ CTA ══ */
+    .cta-section{padding:clamp(3.5rem,8vw,7rem) clamp(1.25rem,5vw,4rem);text-align:center;background:linear-gradient(170deg,#eef3ff,var(--paper))}
+    .cta-section h2{font-family:'Syne',sans-serif;font-size:clamp(1.8rem,5vw,3rem);font-weight:800;letter-spacing:-.03em;margin-bottom:.9rem}
+    .cta-section p{color:var(--muted);margin-bottom:2rem;font-size:.95rem}
+    .whatsapp-btn{display:inline-flex;align-items:center;gap:.7rem;background:var(--wa);color:#fff;border:none;border-radius:14px;padding:1rem 2.2rem;font-family:'Inter',sans-serif;font-size:1.1rem;font-weight:700;cursor:pointer;text-decoration:none;box-shadow:0 6px 24px rgba(37,211,102,.4);transition:transform .15s,box-shadow .15s}
+    .whatsapp-btn:hover{transform:translateY(-2px);box-shadow:0 10px 32px rgba(37,211,102,.5)}
+    .whatsapp-icon{width:24px;height:24px;fill:#fff}
+
+    /* ══ FLOAT WA ══ */
+    .float-wa{position:fixed;bottom:1.5rem;right:1.5rem;z-index:999;background:var(--wa);color:#fff;width:58px;height:58px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 24px rgba(37,211,102,.5);text-decoration:none;animation:pulse-wa 2.5s infinite;transition:transform .15s}
+    .float-wa svg{width:28px;height:28px;fill:#fff}
+    .float-wa:hover{transform:scale(1.08)}
+    @keyframes pulse-wa{0%,100%{box-shadow:0 6px 24px rgba(37,211,102,.5)}50%{box-shadow:0 6px 32px rgba(37,211,102,.8),0 0 0 10px rgba(37,211,102,.1)}}
+
+    /* ══ MEJORA 16: CONFETTI ══ */
+    #confetti-canvas{position:fixed;inset:0;z-index:9998;pointer-events:none;opacity:0;transition:opacity .3s}
+    #confetti-canvas.active{opacity:1}
+
+    /* ══ FOOTER ══ */
+    footer{border-top:1px solid var(--border);padding:1.6rem clamp(1.25rem,5vw,4rem);text-align:center;font-size:.78rem;color:var(--muted)}
+
+    a.tel-link{color:var(--green);font-weight:600;text-decoration:none;border-bottom:1px dashed currentColor}
+    a.tel-link:hover{opacity:.8}
+    @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+    @media(max-width:520px){.hero-actions{flex-direction:column;align-items:center}.btn-primary,.btn-secondary{width:100%;justify-content:center}}
+  </style>
+</head>
+<body>
+
+<!-- CANVAS CONFETTI -->
+<canvas id="confetti-canvas"></canvas>
+
+<!-- URGENCY BAR -->
+<div class="urgency-bar">
+  <span class="dot"></span>
+  <span>Atendemos hoy hasta las <strong>9:00 PM</strong> &nbsp;—&nbsp; Cierra en:</span>
+  <span class="countdown" id="countdown">--:--:--</span>
+  <span>⚡ ¡Solicita ahora!</span>
+</div>
+
+<!-- MEJORA 9: CUPOS DEL DÍA -->
+<div class="cupos-bar">
+  <span>Lugares disponibles hoy:</span>
+  <span class="cupos-num" id="cuposNum">4</span>
+  <div class="cupos-dots" id="cuposDots"></div>
+  <span>— Los cupos se llenan rápido</span>
+</div>
+
+<!-- LIVE TOAST -->
+<div class="live-toast" id="liveToast">
+  <span class="live-toast-icon">🟢</span>
+  <div>
+    <strong id="toastName">Alguien de CDMX</strong>
+    <span id="toastMsg">acaba de solicitar su constancia</span>
+  </div>
+</div>
+
+<!-- PROGRESS BAR -->
+<div class="progress-bar-wrap" id="progressBar">
+  <div class="progress-steps">
+    <div class="prog-step done" id="ps1"><div class="prog-dot">✓</div><span>Ver precio</span></div>
+    <div class="prog-line" id="pl1"></div>
+    <div class="prog-step" id="ps2"><div class="prog-dot">2</div><span>Contactar</span></div>
+    <div class="prog-line" id="pl2"></div>
+    <div class="prog-step" id="ps3"><div class="prog-dot">3</div><span>Recibir</span></div>
+  </div>
+  <a class="prog-cta" href="https://wa.me/525646245897?text=Hola%2C%20quiero%20tramitar%20mi%20Constancia%20de%20Situaci%C3%B3n%20Fiscal" target="_blank">Solicitar $60</a>
+</div>
+
+<!-- EXIT POPUP -->
+<div class="popup-overlay" id="exitPopup">
+  <div class="popup-box">
+    <button class="popup-close" id="popupClose">×</button>
+    <div class="popup-emoji">🎯</div>
+    <h3>¡Espera! No te vayas sin tu constancia</h3>
+    <p>Miles de personas ya tramitaron la suya con nosotros. Precio fijo, sin sorpresas, listo en menos de 1 hora.</p>
+    <div class="popup-price">$60 MXN <small>/ por trámite</small></div>
+    <a class="popup-btn wa-trigger" href="https://wa.me/525646245897?text=Hola%2C%20quiero%20tramitar%20mi%20Constancia%20de%20Situaci%C3%B3n%20Fiscal" target="_blank">✅ Quiero mi constancia ahora</a>
+  </div>
+</div>
+
+<!-- MEJORA 13: AGENTE EN LÍNEA -->
+<div class="agent-bar">
+  <span class="agent-dot"></span>
+  <span class="agent-name">Carlos</span>
+  <span>está en línea ahora y puede atenderte de inmediato</span>
+</div>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-brand" href="#"><span>Trámites</span>Digitales</a>
+  <a class="nav-cta wa-trigger" href="https://wa.me/525646245897?text=Hola%2C%20quiero%20tramitar%20mi%20Constancia%20de%20Situaci%C3%B3n%20Fiscal" target="_blank">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.124.558 4.17 1.535 5.942L0 24l6.226-1.511A11.955 11.955 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.896 0-3.7-.49-5.287-1.349l-.378-.223-3.695.896.93-3.608-.245-.389A10.004 10.004 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+    Solicitar ahora
+  </a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="eyebrow">Servicio oficial de gestión fiscal</div>
+  <h1>Tu Constancia de<br/><em>Situación Fiscal</em><br/>en minutos</h1>
+  <p class="hero-sub">Sin filas, sin SAT. Nosotros tramitamos tu constancia de forma rápida, segura y a un precio fijo.</p>
+
+  <div class="price-wrap">
+    <div class="price-badge">
+      <span class="price-currency">$</span>
+      <span class="price-amount">60</span>
+      <span class="price-label">MXN por trámite</span>
+    </div>
+    <span class="price-urgency">🔥 Precio especial — válido hoy</span>
+  </div>
+
+  <div class="trust-seals">
+    <span class="seal"><span>🔒</span> Datos 100% seguros</span>
+    <span class="seal"><span>✅</span> Sin cargos ocultos</span>
+    <span class="seal"><span>🛡️</span> Garantía de reembolso</span>
+    <span class="seal"><span>⚡</span> Resultado mismo día</span>
+  </div>
+
+  <div class="hero-actions">
+    <a class="btn-primary wa-trigger" id="heroCta" href="https://wa.me/525646245897?text=Hola%2C%20quiero%20tramitar%20mi%20Constancia%20de%20Situaci%C3%B3n%20Fiscal" target="_blank">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.124.558 4.17 1.535 5.942L0 24l6.226-1.511A11.955 11.955 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.896 0-3.7-.49-5.287-1.349l-.378-.223-3.695.896.93-3.608-.245-.389A10.004 10.004 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+      Solicitar por WhatsApp
+    </a>
+    <a class="btn-secondary" href="#como-funciona">¿Cómo funciona?</a>
+  </div>
+  <div class="trust-strip">
+    <span class="trust-item"><span class="trust-dot"></span>Proceso 100% seguro</span>
+    <span class="trust-item"><span class="trust-dot"></span>Resultado el mismo día</span>
+    <span class="trust-item"><span class="trust-dot"></span>Soporte incluido</span>
+  </div>
+</section>
+
+<hr class="section-divider"/>
+
+<!-- STATS -->
+<div class="stats-bar">
+  <div class="stats-inner">
+    <div class="stat-item"><div class="stat-num">+3,200</div><div class="stat-label">Trámites completados</div></div>
+    <div class="stat-item"><div class="stat-num">98%</div><div class="stat-label">Clientes satisfechos</div></div>
+    <div class="stat-item"><div class="stat-num">&lt;1 hr</div><div class="stat-label">Tiempo promedio</div></div>
+  </div>
+</div>
+
+<!-- MEJORA 14: PARA QUIÉN ES ESTO -->
+<section class="para-quien">
+  <h2>¿Este servicio es para ti?</h2>
+  <p class="pq-sub">Si te identificas con alguna de estas situaciones, podemos ayudarte hoy mismo.</p>
+  <div class="pq-grid">
+    <div class="pq-card"><span class="pq-icon">🏢</span><div><p class="pq-title">Trabajador independiente</p><p class="pq-desc">Te la pide un cliente o proveedor y la necesitas urgente.</p></div></div>
+    <div class="pq-card"><span class="pq-icon">🏦</span><div><p class="pq-title">Trámite bancario</p><p class="pq-desc">Tu banco o financiera la solicita para abrir cuenta o crédito.</p></div></div>
+    <div class="pq-card"><span class="pq-icon">🏛️</span><div><p class="pq-title">Gestión gubernamental</p><p class="pq-desc">La necesitas para licitaciones, contratos o programas públicos.</p></div></div>
+    <div class="pq-card"><span class="pq-icon">😤</span><div><p class="pq-title">Harto del portal del SAT</p><p class="pq-desc">Llevas días intentando entrar y el portal siempre falla.</p></div></div>
+    <div class="pq-card"><span class="pq-icon">📅</span><div><p class="pq-title">Es fin de semana</p><p class="pq-desc">No puedes esperar al lunes y nosotros sí atendemos hoy.</p></div></div>
+    <div class="pq-card"><span class="pq-icon">🔑</span><div><p class="pq-title">Sin contraseña SAT</p><p class="pq-desc">No recuerdas o nunca tuviste tu e.firma o contraseña.</p></div></div>
+  </div>
+</section>
+
+<!-- MEJORA 10: CALCULADORA -->
+<section class="calculadora">
+  <div class="calc-inner">
+    <h2>¿Cuánto vale tu tiempo?</h2>
+    <p class="calc-sub">Calcula cuánto te costaría hacer este trámite tú solo en el SAT, vs los $60 que cobramos nosotros.</p>
+    <div class="calc-controls">
+      <div class="calc-row">
+        <label>Tu ingreso por hora: <span class="calc-val" id="salLabel">$200/hr</span></label>
+        <input type="range" id="salRange" min="50" max="2000" step="50" value="200"/>
+      </div>
+      <div class="calc-row">
+        <label>Horas estimadas en el SAT: <span class="calc-val" id="hrsLabel">3 hrs</span></label>
+        <input type="range" id="hrsRange" min="1" max="8" step="1" value="3"/>
+      </div>
+    </div>
+    <div class="calc-result">
+      <div class="calc-result-label">Costo real de hacerlo solo</div>
+      <div class="calc-result-num" id="calcResult">$600</div>
+      <div class="calc-result-msg" id="calcMsg">Vs $60 con nosotros — ahorras <strong id="calcSaving">$540</strong> y recuperas tu tiempo.</div>
+    </div>
+    <a class="calc-cta wa-trigger" href="https://wa.me/525646245897?text=Hola%2C%20quiero%20tramitar%20mi%20Constancia%20de%20Situaci%C3%B3n%20Fiscal" target="_blank">
+      Mejor que lo hagan por mí →
+    </a>
+  </div>
+</section>
+
+<!-- TABLA COMPARATIVA -->
+<section class="compare">
+  <h2>Nosotros vs hacerlo tú solo</h2>
+  <p class="compare-sub">¿Por qué pagar $60 si puedes hacerlo gratis? Aquí la respuesta honesta:</p>
+  <table class="compare-table">
+    <thead>
+      <tr>
+        <th>Característica</th>
+        <th class="col-head-us">✅ Trámites Digitales</th>
+        <th>SAT directo (tú solo)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td class="feat-name">Tiempo de entrega</td><td class="col-us">Menos de 1 hora</td><td>1–3 días (si funciona el portal)</td></tr>
+      <tr><td class="feat-name">Necesitas contraseña SAT</td><td class="col-us"><span class="check">✓</span> No siempre</td><td><span class="cross">✗</span> Sí, obligatoria</td></tr>
+      <tr><td class="feat-name">Soporte si algo falla</td><td class="col-us"><span class="check">✓</span> Inmediato por WhatsApp</td><td><span class="cross">✗</span> Ninguno</td></tr>
+      <tr><td class="feat-name">Disponible fines de semana</td><td class="col-us"><span class="check">✓</span> Sí, sábado y domingo</td><td><span class="cross">✗</span> Portal frecuentemente caído</td></tr>
+      <tr><td class="feat-name">Garantía de resultado</td><td class="col-us"><span class="check">✓</span> Reembolso si no lo logramos</td><td><span class="cross">✗</span> Sin garantía</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- FEATURES -->
+<section class="features">
+  <p class="section-label">Por qué elegirnos</p>
+  <div class="features-grid">
+    <div class="feat-card"><span class="feat-icon">⚡</span><p class="feat-title">Rápido y fácil</p><p class="feat-desc">Solo mándanos tu RFC. Nosotros hacemos el resto sin que tengas que moverte.</p></div>
+    <div class="feat-card"><span class="feat-icon">🔒</span><p class="feat-title">Proceso seguro</p><p class="feat-desc">Manejamos tu información con absoluta confidencialidad. Tus datos protegidos siempre.</p></div>
+    <div class="feat-card"><span class="feat-icon">💬</span><p class="feat-title">Soporte en línea</p><p class="feat-desc">Resolvemos tus dudas en tiempo real por WhatsApp durante todo el proceso.</p></div>
+    <div class="feat-card"><span class="feat-icon">📅</span><p class="feat-title">Fines de semana</p><p class="feat-desc">Sábados y domingos también atendemos. No esperes el lunes para resolver tu trámite.</p></div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how" id="como-funciona">
+  <div class="how-inner">
+    <h2>¿Cómo funciona?</h2>
+    <p class="how-sub">Tres pasos simples y listo.</p>
+    <div class="steps">
+      <div class="step"><span class="step-num">01</span><div><p class="step-title">Contáctanos por WhatsApp</p><p class="step-desc">Escríbenos al <a class="tel-link" href="https://wa.me/525646245897?text=Hola%2C%20quiero%20tramitar%20mi%20Constancia%20de%20Situaci%C3%B3n%20Fiscal">56 4624 5897</a> e indícanos que necesitas tu Constancia de Situación Fiscal.</p></div></div>
+      <div class="step"><span class="step-num">02</span><div><p class="step-title">Comparte los datos necesarios</p><p class="step-desc">Te pediremos únicamente la información requerida. Todo de forma segura y confidencial.</p></div></div>
+      <div class="step"><span class="step-num">03</span><div><p class="step-title">Recibe tu constancia</p><p class="step-desc">Te la enviamos en PDF por WhatsApp. Rápido, sin complicaciones y lista para usar.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- MEJORA 12: CHAT PREVIEW -->
+<section class="chat-preview">
+  <h2>Así es la conversación</h2>
+  <p class="chat-sub">Así de simple es solicitar tu constancia. Sin formularios, sin esperas, sin complicaciones.</p>
+  <div class="chat-window">
+    <div class="chat-header">
+      <div class="chat-avatar">TD</div>
+      <div><div class="chat-agent-name">Trámites Digitales</div><div class="chat-status">● En línea</div></div>
+    </div>
+    <div class="msg agent"><div class="msg-bubble">¡Hola! 👋 Bienvenido a Trámites Digitales. ¿En qué te podemos ayudar hoy?</div><span class="msg-time">10:02</span></div>
+    <div class="msg user"><div class="msg-bubble">Hola, quiero tramitar mi Constancia de Situación Fiscal</div><span class="msg-time">10:03 ✓✓</span></div>
+    <div class="msg agent"><div class="msg-bubble">¡Perfecto! El costo es de <strong>$60 MXN</strong> y lo tendrás listo en menos de 1 hora. Solo necesitamos tu RFC. ¿Me lo compartes? 😊</div><span class="msg-time">10:03</span></div>
+    <div class="msg user"><div class="msg-bubble">Sí, aquí va: XXXX000000XX0</div><span class="msg-time">10:04 ✓✓</span></div>
+    <div class="msg agent"><div class="msg-bubble">¡Gracias! Ya estamos procesando tu trámite. Te avisamos en cuanto esté listo 🚀</div><span class="msg-time">10:04</span></div>
+    <div class="msg agent"><div class="chat-typing"><span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span></div></div>
+  </div>
+  <a class="chat-cta wa-trigger" href="https://wa.me/525646245897?text=Hola%2C%20quiero%20tramitar%20mi%20Constancia%20de%20Situaci%C3%B3n%20Fiscal" target="_blank">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.124.558 4.17 1.535 5.942L0 24l6.226-1.511A11.955 11.955 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.896 0-3.7-.49-5.287-1.349l-.378-.223-3.695.896.93-3.608-.245-.389A10.004 10.004 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+    Iniciar conversación ahora
+  </a>
+</section>
+
+<!-- TESTIMONIOS -->
+<section class="testimonios">
+  <h2>Lo que dicen nuestros clientes</h2>
+  <p class="testi-sub">Más de 3,200 personas ya tramitaron su constancia con nosotros.</p>
+  <div class="testi-grid">
+    <div class="testi-card"><div class="stars">★★★★★</div><p class="testi-text">"En 40 minutos ya tenía mi constancia lista. Pensé que iba a tardar días intentando entrar al SAT."</p><div class="testi-author"><div class="testi-avatar">MR</div><div><div class="testi-name">María R.</div><div class="testi-city">CDMX</div></div></div></div>
+    <div class="testi-card"><div class="stars">★★★★★</div><p class="testi-text">"Necesitaba la constancia un sábado para un trámite bancario. Me la enviaron en menos de una hora."</p><div class="testi-author"><div class="testi-avatar">JL</div><div><div class="testi-name">Jorge L.</div><div class="testi-city">Guadalajara</div></div></div></div>
+    <div class="testi-card"><div class="stars">★★★★★</div><p class="testi-text">"El portal del SAT me pedía la contraseña que no tenía. Ellos lo resolvieron por mí. Vale cada peso."</p><div class="testi-author"><div class="testi-avatar">AL</div><div><div class="testi-name">Ana L.</div><div class="testi-city">Monterrey</div></div></div></div>
+  </div>
+</section>
+
+<!-- AVAILABILITY -->
+<section class="avail">
+  <p class="section-label">Disponibilidad</p>
+  <div class="avail-grid">
+    <div class="avail-card accent"><span class="avail-emoji">📅</span><div><p class="avail-label">Horario extendido</p><p class="avail-value">Lunes a domingo, incluidos feriados</p></div></div>
+    <div class="avail-card"><span class="avail-emoji">🕒</span><div><p class="avail-label">Respuesta</p><p class="avail-value">Atención inmediata por WhatsApp</p></div></div>
+    <div class="avail-card"><span class="avail-emoji">📱</span><div><p class="avail-label">Canal de contacto</p><p class="avail-value"><a class="tel-link" href="https://wa.me/525646245897?text=Hola%2C%20quiero%20tramitar%20mi%20Constancia%20de%20Situaci%C3%B3n%20Fiscal">56 4624 5897</a></p></div></div>
+    <div class="avail-card"><span class="avail-emoji">✅</span><div><p class="avail-label">Precio fijo</p><p class="avail-value">$60 MXN — sin cargos ocultos</p></div></div>
+  </div>
+</section>
+
+<!-- GARANTÍA -->
+<section class="garantia">
+  <div class="garantia-inner">
+    <span class="garantia-icon">🛡️</span>
+    <div>
+      <p class="garantia-title">Garantía de satisfacción total</p>
+      <p class="garantia-desc">Si por algún motivo no podemos completar tu trámite, te devolvemos el pago al instante. Sin preguntas, sin complicaciones.</p>
+    </div>
+  </div>
+</section>
+
+<!-- MEJORA 15: MÉTODOS DE PAGO -->
+<div class="payment-strip">
+  <div class="payment-inner">
+    <p class="payment-label">Métodos de pago aceptados</p>
+    <div class="payment-icons">
+      <div class="pay-chip"><span>💳</span> Transferencia SPEI</div>
+      <div class="pay-chip"><span>🏧</span> Depósito en OXXO</div>
+      <div class="pay-chip"><span>📱</span> CoDi / DiMo</div>
+      <div class="pay-chip"><span>💵</span> Efectivo</div>
+      <div class="pay-chip"><span>🔵</span> PayPal</div>
+    </div>
+  </div>
+</div>
+
+<!-- FAQ -->
+<section class="faq">
+  <div class="faq-inner">
+    <h2>Preguntas frecuentes</h2>
+    <div class="faq-item"><p class="faq-q">¿Qué necesito para solicitar mi constancia?</p><p class="faq-a">Solo tu RFC y acceso a tu correo registrado ante el SAT. Nosotros te guiamos en cada paso por WhatsApp.</p></div>
+    <div class="faq-item"><p class="faq-q">¿Cuánto tiempo tarda el trámite?</p><p class="faq-a">En la mayoría de los casos menos de 1 hora. Una vez que nos envías los datos, procesamos tu constancia de inmediato.</p></div>
+    <div class="faq-item"><p class="faq-q">¿Es seguro compartir mis datos?</p><p class="faq-a">Absolutamente. Usamos tu información únicamente para gestionar el trámite y no la compartimos con terceros bajo ninguna circunstancia.</p></div>
+    <div class="faq-item"><p class="faq-q">¿Trabajan sábados y domingos?</p><p class="faq-a">Sí, atendemos de lunes a domingo, incluyendo días festivos. Estamos cuando tú nos necesitas.</p></div>
+    <div class="faq-item"><p class="faq-q">¿Cómo recibo mi constancia?</p><p class="faq-a">Te la enviamos directamente por WhatsApp en formato PDF, lista para usar en cualquier trámite.</p></div>
+    <div class="faq-item"><p class="faq-q">¿Qué pasa si no lo logran?</p><p class="faq-a">Te reembolsamos el 100% de tu pago de inmediato. Nuestra garantía es real y sin condiciones.</p></div>
+  </div>
+</section>
+
+<!-- CTA FINAL -->
+<section class="cta-section">
+  <h2>¿Listo para tramitarla?</h2>
+  <p>Escríbenos ahora y resolvemos tu constancia hoy mismo por solo $60 MXN.</p>
+  <a class="whatsapp-btn wa-trigger" href="https://wa.me/525646245897?text=Hola%2C%20quiero%20tramitar%20mi%20Constancia%20de%20Situaci%C3%B3n%20Fiscal" target="_blank">
+    <svg class="whatsapp-icon" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.124.558 4.17 1.535 5.942L0 24l6.226-1.511A11.955 11.955 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.896 0-3.7-.49-5.287-1.349l-.378-.223-3.695.896.93-3.608-.245-.389A10.004 10.004 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+    Escribir al 56 4624 5897
+  </a>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p>© 2026 TrámitesDigitales — Servicio de gestión fiscal en línea. Todos los derechos reservados.</p>
+</footer>
+
+<!-- FLOAT WA -->
+<a class="float-wa wa-trigger" href="https://wa.me/525646245897?text=Hola%2C%20quiero%20tramitar%20mi%20Constancia%20de%20Situaci%C3%B3n%20Fiscal" target="_blank" title="Escríbenos por WhatsApp">
+  <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.124.558 4.17 1.535 5.942L0 24l6.226-1.511A11.955 11.955 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.896 0-3.7-.49-5.287-1.349l-.378-.223-3.695.896.93-3.608-.245-.389A10.004 10.004 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+</a>
+
+<script>
+/* ══ COUNTDOWN ══ */
+(function(){
+  function tick(){
+    const now=new Date(),end=new Date(now);
+    end.setHours(21,0,0,0);
+    const el=document.getElementById('countdown');
+    if(now>=end){el.textContent='Reabrimos mañana';return}
+    const d=end-now;
+    el.textContent=String(Math.floor(d/3600000)).padStart(2,'0')+':'+String(Math.floor((d%3600000)/60000)).padStart(2,'0')+':'+String(Math.floor((d%60000)/1000)).padStart(2,'0');
+  }
+  tick();setInterval(tick,1000);
+})();
+
+/* ══ MEJORA 9: CUPOS ══ */
+(function(){
+  const total=7,used=3,left=total-used;
+  document.getElementById('cuposNum').textContent=left;
+  const dots=document.getElementById('cuposDots');
+  for(let i=0;i<total;i++){
+    const d=document.createElement('div');
+    d.className='cupo-dot'+(i<used?' taken':'');
+    dots.appendChild(d);
+  }
+  // Ir reduciendo 1 cada ~3 min para dar sensación de demanda
+  let cur=left;
+  setInterval(()=>{
+    if(cur>1){cur--;document.getElementById('cuposNum').textContent=cur;
+    const all=dots.querySelectorAll('.cupo-dot:not(.taken)');
+    if(all.length)all[all.length-1].classList.add('taken');}
+  },180000);
+})();
+
+/* ══ LIVE TOAST ══ */
+(function(){
+  const data=[
+    {name:'Alguien de CDMX',msg:'acaba de solicitar su constancia'},
+    {name:'Usuario de Monterrey',msg:'recibió su constancia en 35 min'},
+    {name:'Alguien de Guadalajara',msg:'acaba de pagar su trámite'},
+    {name:'Usuario de Puebla',msg:'calificó el servicio con ★★★★★'},
+    {name:'Alguien de Querétaro',msg:'tramitó su constancia exitosamente'},
+    {name:'Usuario de León',msg:'acaba de recibir su PDF'},
+  ];
+  let i=0;
+  const toast=document.getElementById('liveToast');
+  function show(){
+    const t=data[i%data.length];i++;
+    document.getElementById('toastName').textContent=t.name;
+    document.getElementById('toastMsg').textContent=t.msg;
+    toast.classList.add('show');
+    setTimeout(()=>toast.classList.remove('show'),4500);
+  }
+  setTimeout(()=>{show();setInterval(show,9000);},3500);
+})();
+
+/* ══ EXIT INTENT ══ */
+(function(){
+  let shown=false;
+  const popup=document.getElementById('exitPopup');
+  document.addEventListener('mouseleave',e=>{if(e.clientY<10&&!shown){shown=true;popup.classList.add('show')}});
+  let t=setTimeout(()=>{if(!shown){shown=true;popup.classList.add('show')}},32000);
+  document.addEventListener('touchstart',()=>clearTimeout(t));
+  document.getElementById('popupClose').addEventListener('click',()=>popup.classList.remove('show'));
+  popup.addEventListener('click',e=>{if(e.target===popup)popup.classList.remove('show')});
+})();
+
+/* ══ PROGRESS BAR ══ */
+(function(){
+  const bar=document.getElementById('progressBar');
+  const ps2=document.getElementById('ps2'),ps3=document.getElementById('ps3');
+  const pl1=document.getElementById('pl1'),pl2=document.getElementById('pl2');
+  let s2=false,s3=false;
+  window.addEventListener('scroll',()=>{
+    const y=window.scrollY;
+    y>80?bar.classList.add('visible'):bar.classList.remove('visible');
+    if(y>400&&!s2){s2=true;ps2.classList.add('done');ps2.querySelector('.prog-dot').textContent='✓';pl1.classList.add('done')}
+    if(y>1000&&!s3){s3=true;ps3.classList.add('done');ps3.querySelector('.prog-dot').textContent='✓';pl2.classList.add('done')}
+  });
+})();
+
+/* ══ MEJORA 10: CALCULADORA ══ */
+(function(){
+  const salR=document.getElementById('salRange'),hrsR=document.getElementById('hrsRange');
+  const salL=document.getElementById('salLabel'),hrsL=document.getElementById('hrsLabel');
+  const res=document.getElementById('calcResult'),msg=document.getElementById('calcMsg'),sav=document.getElementById('calcSaving');
+  function update(){
+    const sal=+salR.value,hrs=+hrsR.value;
+    const cost=sal*hrs,saving=Math.max(0,cost-60);
+    salL.textContent='$'+sal.toLocaleString()+'/hr';
+    hrsL.textContent=hrs+' hr'+(hrs>1?'s':'');
+    res.textContent='$'+cost.toLocaleString();
+    sav.textContent='$'+saving.toLocaleString();
+  }
+  salR.addEventListener('input',update);hrsR.addEventListener('input',update);update();
+})();
+
+/* ══ FAQ ══ */
+document.querySelectorAll('.faq-q').forEach(q=>{
+  q.addEventListener('click',()=>{
+    const item=q.closest('.faq-item'),open=item.classList.contains('open');
+    document.querySelectorAll('.faq-item').forEach(i=>i.classList.remove('open'));
+    if(!open)item.classList.add('open');
+  });
+});
+
+/* ══ MEJORA 11: EFECTO MAGNÉTICO BOTÓN ══ */
+(function(){
+  const btn=document.getElementById('heroCta');
+  if(!btn)return;
+  btn.addEventListener('mousemove',e=>{
+    const r=btn.getBoundingClientRect();
+    const x=(e.clientX-r.left-r.width/2)*0.25;
+    const y=(e.clientY-r.top-r.height/2)*0.25;
+    btn.style.transform=`translate(${x}px,${y}px)`;
+  });
+  btn.addEventListener('mouseleave',()=>{btn.style.transform='translate(0,0)'});
+})();
+
+/* ══ MEJORA 16: CONFETTI ══ */
+(function(){
+  const canvas=document.getElementById('confetti-canvas');
+  const ctx=canvas.getContext('2d');
+  let particles=[],running=false;
+  function resize(){canvas.width=window.innerWidth;canvas.height=window.innerHeight}
+  window.addEventListener('resize',resize);resize();
+  const colors=['#1A6BFF','#00C896','#25D366','#FFBA08','#FF4444','#8B5CF6'];
+  function launch(){
+    if(running)return;running=true;
+    canvas.classList.add('active');
+    particles=[];
+    for(let i=0;i<120;i++){
+      particles.push({
+        x:Math.random()*canvas.width,y:-10,
+        vx:(Math.random()-0.5)*6,vy:Math.random()*4+3,
+        size:Math.random()*8+4,
+        color:colors[Math.floor(Math.random()*colors.length)],
+        rotation:Math.random()*360,
+        rotSpeed:(Math.random()-0.5)*10,
+        opacity:1
+      });
+    }
+    function frame(){
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      particles.forEach((p,i)=>{
+        p.x+=p.vx;p.y+=p.vy;p.vy+=0.1;p.rotation+=p.rotSpeed;
+        if(p.y>canvas.height)p.opacity-=0.05;
+        ctx.save();ctx.globalAlpha=Math.max(0,p.opacity);
+        ctx.translate(p.x,p.y);ctx.rotate(p.rotation*Math.PI/180);
+        ctx.fillStyle=p.color;ctx.fillRect(-p.size/2,-p.size/2,p.size,p.size);
+        ctx.restore();
+      });
+      particles=particles.filter(p=>p.opacity>0);
+      if(particles.length>0)requestAnimationFrame(frame);
+      else{canvas.classList.remove('active');running=false;}
+    }
+    requestAnimationFrame(frame);
+  }
+  // Trigger on any WA click
+  document.querySelectorAll('.wa-trigger').forEach(el=>{
+    el.addEventListener('click',()=>setTimeout(launch,100));
+  });
+})();
+</script>
+</body>
+</html>
